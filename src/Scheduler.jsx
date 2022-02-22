@@ -24,7 +24,6 @@ const schedulerData = new SchedulerData(new moment(new Date()).format('YYYY-MM-D
         viewName: 'Year', viewType: ViewTypes.Year, showAgenda: false,
       },
     ],
-    eventItemPopoverEnabled: false,
   });
   schedulerData.localeMoment.locale('en');
   schedulerData.setResources(DemoData.resources);
