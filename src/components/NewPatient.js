@@ -72,9 +72,9 @@ const NewPatient = () => {
     }
   };
 
-  if (!currentUser) {
-    return <Redirect to="/login" />;
-  }
+  // if (!currentUser) {
+  //   return <Redirect to="/login" />;
+  // }
   if (successful) {
     return <Redirect to="/appointments/new" />;
   }

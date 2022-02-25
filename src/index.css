@@ -25,3 +25,19 @@ code {
     'Courier New',
     monospace;
 }
+
+.ant-modal-close-x {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ant-list-item-meta {
+  align-items: center;
+  flex: 1 1 ;
+}
+
+.ant-list-item-meta-content {
+  flex: 1
+}
+

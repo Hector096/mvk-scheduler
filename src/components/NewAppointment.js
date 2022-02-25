@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Redirect, useHistory } from 'react-router-dom';
+import { Redirect, useParams } from 'react-router-dom';
 import { useAlert } from 'react-alert';
 import {
-  Form, Input, DatePicker, Select, Typography, Button, InputNumber,
+  Form, Input, Select, Button, InputNumber,
 } from 'antd';
 import { setMessage } from '../redux/actions/message';
 import userService from '../services/user.service';
 import getDoctors from '../redux/actions/user';
 import getPatients from '../redux/actions/patients';
 
-const NewAppointment = () => {
-  const history = useHistory();
+const NewAppointment = (props) => {
+  console.log(props.newDate);
   const { Option } = Select;
-  const { Title } = Typography;
   const { user: currentUser } = useSelector(state => state.auth);
   const [successful, setSuccessful] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,6 +22,7 @@ const NewAppointment = () => {
   const { doctors } = useSelector(state => state.user);
   const { patients } = useSelector(state => state.patients);
   const dispatch = useDispatch();
+  const { id } = useParams();
   const alert = useAlert();
   const formItemLayout = {
     labelCol: {
@@ -47,16 +47,6 @@ const NewAppointment = () => {
   };
 
   useEffect(() => {
-    if (doctors.length === 0 && currentUser) {
-      setLoadingDoctors(true);
-      dispatch(getDoctors())
-        .then(() => {
-          setLoadingDoctors(false);
-        })
-        .catch(() => {
-          dispatch(setMessage('Unable to get doctors list'));
-        });
-    }
     if (patients.length === 0 && currentUser) {
       setLoadingPatients(true);
       dispatch(getPatients())
@@ -67,7 +57,7 @@ const NewAppointment = () => {
           dispatch(setMessage('Unable to get Patient list'));
         });
     }
-  }, []);
+  }, [dispatch]);
 
   const onFinish = values => {
     setLoading(true);
@@ -107,37 +97,24 @@ const NewAppointment = () => {
     }
   };
 
-  const options = doctors.map(doctor => (
-    <Option
-      key={doctor.id}
-      value={doctor.name}
-    >
-      {doctor.name}
-    </Option>
-  ));
-
   const patientOptions = patients.map(patient => (
     <Option
       key={patient.id}
       value={`${patient.firstName} ${patient.lastName}`}
     >
-      {`${patient.firstName} ${patient.lastName}`}
+      {`${patient.pid} ${patient.firstName} ${patient.lastName}`}
     </Option>
   ));
 
-  if (!currentUser) {
-    return <Redirect to="/login" />;
-  }
+  // if (!currentUser) {
+  //   return <Redirect to="/login" />;
+  // }
   if (successful) {
-    return <Redirect to="/appointments" />;
+    return <Redirect to={`/calendar/${id}`} />;
   }
-  const newPatient = () => {
-    history.push('/patient/new');
-  };
 
   return (
     <div className="container mt-4">
-      <Title className="text-center mb-5">Create New Appointment</Title>
       {message && (
       <div className="form-group">
         <div className={successful ? 'alert alert-success' : 'alert alert-danger'} role="alert">
@@ -146,39 +123,12 @@ const NewAppointment = () => {
       </div>
       )}
       {/* eslint-disable-next-line */}
-      <Form {...formItemLayout} className="p-5 border" name="newpatient" onFinish={onFinish} >
+      <Form {...formItemLayout} name="newpatient" onFinish={onFinish} >
         <Form.Item
           label="Appointment Date"
           name="scheduleDateTime"
-          rules={[
-            {
-              required: true,
-              message: 'Please input registration date',
-            },
-          ]}
         >
-          <DatePicker
-            showTime
-            allowClear
-            style={{
-              width: '100%',
-            }}
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Select Doctor"
-          name="doctor"
-          rules={[
-            {
-              required: true,
-              message: 'Please Select Doctor',
-            },
-          ]}
-        >
-          <Select allowClear showSearch>
-            {loadingDoctors ? <Option>Loading..</Option> : options }
-          </Select>
+            <Input placeholder={props.newDate} disabled />
         </Form.Item>
 
         <Form.Item
@@ -199,19 +149,6 @@ const NewAppointment = () => {
             {loadingPatients ? <Option>Loading..</Option> : patientOptions }
           </Select>
         </Form.Item>
-        <Form.Item wrapperCol={{ offset: 6, span: 14 }}>
-          <Button
-            type="dashed"
-            block
-            onClick={newPatient}
-            style={{
-              width: '100%',
-            }}
-          >
-            Create New Patient
-          </Button>
-        </Form.Item>
-
         <Form.Item
           label="Select Appointment Type"
           name="appointmentType"
@@ -306,9 +243,6 @@ const NewAppointment = () => {
 
         <div className="d-flex flex-column">
           <Form.Item className="text-center" wrapperCol={{ offset: 0 }}>
-            <Button htmlType="cancel" onClick={history.goBack} style={{ margin: '0 8px' }}>
-              Cancel
-            </Button>
             <Button htmlType="submit" disabled={loading || loadingDoctors} type="primary">
               {loading && (
               <span className="spinner-border spinner-border-sm" />

@@ -56,7 +56,7 @@ const Login = () => {
   };
 
   if (isLoggedIn) {
-    return <Redirect to="/appointments" />;
+    return <Redirect to="/home" />;
   }
 
   return (

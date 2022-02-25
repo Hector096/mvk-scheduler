@@ -5,8 +5,9 @@ import {
 } from './types';
 
 import UserService from '../../services/user.service';
+import { data } from 'jquery';
 
-export default () => dispatch => UserService.getDoctors().then(
+export default () => async (dispatch) => await UserService.getDoctors().then(
   response => {
     dispatch({
       type: DOCTORS_SUCCESS,
@@ -17,7 +18,6 @@ export default () => dispatch => UserService.getDoctors().then(
       type: SET_MESSAGE,
       payload: response.data.message,
     });
-
     return Promise.resolve();
   },
   error => {
